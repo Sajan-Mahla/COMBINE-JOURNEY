@@ -1,0 +1,17 @@
+so hey everyone its my DAY 1 here for COMBINE, like i learned about its define i got to know about its working.
+got to know about PUBLISHER -> OPERATOR(s) -> SUBSCRIBER........
+
+ayye WAIT here's my first CODE in COMBINE:
+import Combine
+
+let numbers = [1,2,3,4,5,6,7,8,9].publisher
+
+let pipeline = numbers
+    .filter{$0 % 2 == 0}
+    .map{$0 * 2}
+    .sink {value in
+        print("The even numbers are:", value)
+    }
+
+
+this is the  code which use the filter to filter out the GARBAGE value(NON-EVEN/ODD) and then multiply it by 2 then print it.....
