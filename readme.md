@@ -26,8 +26,8 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | Day | Topic | Status |
 |-----|-------|--------|
 | 1 | Publisher & Subscriber Basics | ✅ Completed |
-| 2 | Just, Future, sink() Basics | ⏳ Next Up |
-| 3 | AnyCancellable & Memory Handling | ⬜️ |
+| 2 | Just, Future, sink() Basics | ✅ Completed |
+| 3 | AnyCancellable & Memory Handling | ⏳ Next Up |
 | 4 | Basic Operators (map, filter, compactMap) | ⬜️ |
 | 5 | Error Types (Never vs Failure) | ⬜️ |
 | 6 | Chain Building | ⬜️ |
