@@ -1,0 +1,42 @@
+so its a good day like i did 3 things today: JUST FUTURE SINK()
+CODES--
+
+JUST:
+import Combine
+
+let publisher = Just("Sajan JUST arrived")
+let cancellable = publisher.sink { value in
+    print(value)
+}
+
+__________________________________________________________________________________________________________________________________________________________
+FUTURE:
+
+import Combine
+
+func getFutureValue() -> Future<String, Never> {
+    Future { promise in
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            promise(.success("🚀 Future completed"))
+        }
+    }
+}
+
+let cancellable = getFutureValue()
+    .sink { value in
+        print(value)
+    }
+__________________________________________________________________________________________________________________________________________________________
+Sink():
+import Combine
+
+let numbers = [1, 2, 3].publisher
+
+let cancellable = numbers.sink(
+    receiveCompletion: { completion in
+        print("Completed: \(completion)")
+    },
+    receiveValue: { value in
+        print("Got: \(value)")
+    }
+)
