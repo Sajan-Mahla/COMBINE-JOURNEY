@@ -1,0 +1,32 @@
+so hey everyone today i did learned about <ANYCANCELLABLES>
+
+want code?? HERE it is:
+
+import Foundation
+import Combine
+
+
+// ___________JUST- code________________
+Just("No Store")
+    .sink{ value in
+        print("Value:", value)
+        
+    }
+
+
+// ___________SUBSCRIBER- code________________
+var cancellable = Set<AnyCancellable>()
+
+Just("Stored")
+    .sink{
+        value in
+        print("value:", value)
+    }
+    .store(in: &cancellable)
+// ___________TIMER- code ________________
+Timer.publish(every: 1.0, on: .main, in: .common)
+    .autoconnect()
+    .sink{ time in
+        print("Tick:", time)
+    }
+    .store(in: &cancellable)
