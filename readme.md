@@ -28,8 +28,8 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 1 | Publisher & Subscriber Basics | ✅ Completed |
 | 2 | Just, Future, sink() Basics | ✅ Completed |
 | 3 | AnyCancellable & Memory Handling | ✅ Completed |
-| 4 | Basic Operators (map, filter, compactMap) | ⏳ Next Up |
-| 5 | Error Types (Never vs Failure) | ⬜️ |
+| 4 | Basic Operators (map, filter, compactMap) | ✅ Completed|
+| 5 | Error Types (Never vs Failure) | ⏳ Next Up |
 | 6 | Chain Building | ⬜️ |
 | 7 | Project: Number Streamer | ⬜️ |
 
@@ -40,19 +40,19 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 ```swift
 import Combine
 
-let numbers = [1,2,3,4,5,6,7,8,9].publisher
+let challenge = [1,2,3,4,5,6,7,8,9,10].publisher
 
-let pipeline = numbers
-    .filter { $0 % 2 == 0 }
-    .map { $0 * 2 }
-    .sink { value in
-        print("The even numbers are:", value)
+let cancellable = challenge
+    .map{$0 * 2}
+    .filter{$0 >= 10}
+    .sink{
+        print($0)
     }
 ```
 
 ---
 
-## 💡 Takeaway of Day 1
+## 💡 Takeaway of Day 4
 
 **Combine = Publisher → Operator → Subscriber**  
 
