@@ -1,0 +1,44 @@
+hi world, day 4 done here's the code.....
+
+
+import Combine
+
+
+//___________FILTER && MAP-code___________
+let number = [1,2,3,4,5,6,7,8,9,10].publisher
+let cancellable = number
+    .filter {$0 % 2 == 0}
+    .map{$0 * 10}
+    .sink{
+        print($0)
+    }
+
+
+//___________COMPACT MAP-code___________
+let strings = ["1","2","3","4","5","6","Sajan","mahla","Sam"].publisher
+let cancel = strings
+    .compactMap{Int($0)}
+    .sink{
+        print($0)
+    }
+
+
+/* CHALLENGE:
+ Emits numbers 1–10
+ Doubles each value
+ Filters out values less than 10
+ Prints the final result
+ */
+
+
+//___________CHALLENGE-code___________
+let challenge = [1,2,3,4,5,6,7,8,9,10].publisher
+
+let cancellabl = challenge
+    .map{$0 * 2}
+    .filter{$0 >= 10}
+    .sink{
+        print($0)
+    }
+
+
