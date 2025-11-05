@@ -29,8 +29,8 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 2 | Just, Future, sink() Basics | ✅ Completed |
 | 3 | AnyCancellable & Memory Handling | ✅ Completed |
 | 4 | Basic Operators (map, filter, compactMap) | ✅ Completed|
-| 5 | Error Types (Never vs Failure) | ⏳ Next Up |
-| 6 | Chain Building | ⬜️ |
+| 5 | Error Types (Never vs Failure) | ✅ Completed |
+| 6 | Chain Building | ⏳ Next Up |
 | 7 | Project: Number Streamer | ⬜️ |
 
 ---
@@ -40,19 +40,25 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 ```swift
 import Combine
 
-let challenge = [1,2,3,4,5,6,7,8,9,10].publisher
+enum NetworkError: Error {
+    case offline
+}
 
-let cancellable = challenge
-    .map{$0 * 2}
-    .filter{$0 >= 10}
-    .sink{
-        print($0)
-    }
+let successPublisher = [10, 20, 30].publisher
+let failPublisher = Fail<Int, NetworkError>(error: .offline)
+
+let cancellable = successPublisher
+    .setFailureType(to: NetworkError.self) // unify error types
+    .merge(with: failPublisher)
+    .sink(receiveCompletion: { print("Completion: \($0)") },
+          receiveValue: { print("Value: \($0)") })
+
+
 ```
 
 ---
 
-## 💡 Takeaway of Day 4
+## 💡 Takeaway of Day 05
 
 **Combine = Publisher → Operator → Subscriber**  
 
