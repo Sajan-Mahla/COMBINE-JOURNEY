@@ -1,0 +1,66 @@
+So hey everyone,
+its DAY 6 of my COMBINE journey.
+today i made my first chain on combine.
+
+import Combine
+import Foundation
+
+print("🔗 DAY 6: BUILD YOUR FIRST CHAIN\n")
+
+// MARK: - What is a Chain?
+print("What is a chain?")
+print("Publisher → map → filter → sink")
+print("Data flows from left to right!\n")
+
+var cancellables = Set<AnyCancellable>()
+
+// MARK: - Example 1: Simple Chain
+print("📝 EXAMPLE 1: Simple Number Chain\n")
+
+[1, 2, 3, 4, 5].publisher
+    .map { $0 * 2 }           // Double each number
+    .filter { $0 > 5 }        // Keep only numbers > 5
+    .sink { print("Got: \($0)") }
+    .store(in: &cancellables)
+
+print("\n✅ What happened?")
+print("1 → 2 → ❌ (not > 5)")
+print("2 → 4 → ❌ (not > 5)")
+print("3 → 6 → ✅ Got: 6")
+print("4 → 8 → ✅ Got: 8")
+print("5 → 10 → ✅ Got: 10")
+
+// MARK: - Example 2: Text Chain
+print("\n\n📝 EXAMPLE 2: Name Chain\n")
+
+["john", "alice", "bob", "charlie"].publisher
+    .map { $0.uppercased() }  // Make uppercase
+    .filter { $0.count > 3 }  // Keep names longer than 3 letters
+    .sink { print("✓ \($0)") }
+    .store(in: &cancellables)
+
+print("\n✅ What happened?")
+print("john → JOHN → ✅ (4 letters)")
+print("alice → ALICE → ✅ (5 letters)")
+print("bob → BOB → ❌ (3 letters)")
+print("charlie → CHARLIE → ✅ (7 letters)")
+
+// MARK: - Example 3: Add More Steps
+print("\n\n📝 EXAMPLE 3: Longer Chain\n")
+
+[10, 20, 30, 40, 50].publisher
+    .map { $0 / 10 }          // Divide by 10
+    .filter { $0 > 2 }        // Keep > 2
+    .map { "Number: \($0)" }  // Make it a string
+    .sink { print($0) }
+    .store(in: &cancellables)
+
+print("\n✅ Flow:")
+print("10 → 1 → ❌")
+print("20 → 2 → ❌")
+print("30 → 3 → ✅ → Number: 3")
+print("40 → 4 → ✅ → Number: 4")
+print("50 → 5 → ✅ → Number: 5")
+
+
+
