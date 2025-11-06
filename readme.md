@@ -30,8 +30,8 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 3 | AnyCancellable & Memory Handling | ✅ Completed |
 | 4 | Basic Operators (map, filter, compactMap) | ✅ Completed|
 | 5 | Error Types (Never vs Failure) | ✅ Completed |
-| 6 | Chain Building | ⏳ Next Up |
-| 7 | Project: Number Streamer | ⬜️ |
+| 6 | Chain Building | ✅ Completed |
+| 7 | Project: Number Streamer | ⏳ Next Up |
 
 ---
 
