@@ -1,0 +1,24 @@
+so here's comes the week. like bro its still look like ive done 100 days of swift just yesterday.
+here's the code FOR MY  SEXIEST COMBINE:::::::::::
+import Combine
+import Foundation
+
+let userInput = 10
+let countdownSubject = PassthroughSubject<Int, Never>()
+
+var cancellables = Set<AnyCancellable>()
+
+Timer.publish(every: 1, on: .main, in: .common)
+    .autoconnect()
+    .scan(userInput + 1) { value, _ in
+        value - 1
+    }
+    .prefix(while: { $0 >= 0 })
+    .sink { value in
+        countdownSubject.send(value)
+    }
+    .store(in: &cancellables)
+
+countdownSubject
+    .sink { print("⏱️ Countdown:", $0) }
+    .store(in: &cancellables)
