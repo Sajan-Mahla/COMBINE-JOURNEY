@@ -31,7 +31,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 4 | Basic Operators (map, filter, compactMap) | ✅ Completed|
 | 5 | Error Types (Never vs Failure) | ✅ Completed |
 | 6 | Chain Building | ✅ Completed |
-| 7 | Project: Number Streamer | ⏳ Next Up |
+| 7 | Project: Number Streamer | ✅ Completed  |
 
 ---
 
@@ -39,20 +39,27 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 
 ```swift
 import Combine
+import Foundation
 
-enum NetworkError: Error {
-    case offline
-}
+let userInput = 10
+let countdownSubject = PassthroughSubject<Int, Never>()
 
-let successPublisher = [10, 20, 30].publisher
-let failPublisher = Fail<Int, NetworkError>(error: .offline)
+var cancellables = Set<AnyCancellable>()
 
-let cancellable = successPublisher
-    .setFailureType(to: NetworkError.self) // unify error types
-    .merge(with: failPublisher)
-    .sink(receiveCompletion: { print("Completion: \($0)") },
-          receiveValue: { print("Value: \($0)") })
+Timer.publish(every: 1, on: .main, in: .common)
+    .autoconnect()
+    .scan(userInput + 1) { value, _ in
+        value - 1
+    }
+    .prefix(while: { $0 >= 0 })
+    .sink { value in
+        countdownSubject.send(value)
+    }
+    .store(in: &cancellables)
 
+countdownSubject
+    .sink { print("⏱️ Countdown:", $0) }
+    .store(in: &cancellables)
 
 ```
 
