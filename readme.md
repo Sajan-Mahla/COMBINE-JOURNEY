@@ -32,6 +32,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 5 | Error Types (Never vs Failure) | ✅ Completed |
 | 6 | Chain Building | ✅ Completed |
 | 7 | Project: Number Streamer | ✅ Completed  |
+| 8 | URLSession.dataTaskPublisher | ✅ Completed  |
 
 ---
 
@@ -41,35 +42,38 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 import Combine
 import Foundation
 
-let userInput = 10
-let countdownSubject = PassthroughSubject<Int, Never>()
-
 var cancellables = Set<AnyCancellable>()
 
-Timer.publish(every: 1, on: .main, in: .common)
-    .autoconnect()
-    .scan(userInput + 1) { value, _ in
-        value - 1
-    }
-    .prefix(while: { $0 >= 0 })
-    .sink { value in
-        countdownSubject.send(value)
-    }
+let url = URL(string: "https://jsonplaceholder.typicode.com/posts")!
+
+URLSession.shared.dataTaskPublisher(for: url)
+    .map(\.data)
+    .decode(type: [Post].self, decoder: JSONDecoder())
+    .sink(receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            print("✅ Finished fetching")
+        case .failure(let error):
+            print("❌ Error:", error)
+        }
+    }, receiveValue: { posts in
+        print("📰 Got \(posts.count) posts")
+    })
     .store(in: &cancellables)
 
-countdownSubject
-    .sink { print("⏱️ Countdown:", $0) }
-    .store(in: &cancellables)
+struct Post: Codable {
+    let id: Int
+    let title: String
+    let body: String
+}
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 05
+## 💡 Takeaway of Day 08
 
-**Combine = Publisher → Operator → Subscriber**  
-
-It's not just code; it's **data reacting in motion**.
+ It's not just code; it's **data reacting in motion**.
 
 ---
 
