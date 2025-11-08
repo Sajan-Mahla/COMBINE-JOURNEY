@@ -1,0 +1,33 @@
+so after first LEARNING week of the combine. now started the --> URLSession.shared.dataTaskPublisher
+
+
+CODE :
+
+import Combine
+import Foundation
+
+var cancellables = Set<AnyCancellable>()
+
+let url = URL(string: "https://jsonplaceholder.typicode.com/posts")!
+
+URLSession.shared.dataTaskPublisher(for: url)
+    .map(\.data)
+    .decode(type: [Post].self, decoder: JSONDecoder())
+    .sink(receiveCompletion: { completion in
+        switch completion {
+        case .finished:
+            print("✅ Finished fetching")
+        case .failure(let error):
+            print("❌ Error:", error)
+        }
+    }, receiveValue: { posts in
+        print("📰 Got \(posts.count) posts")
+    })
+    .store(in: &cancellables)
+
+struct Post: Codable {
+    let id: Int
+    let title: String
+    let body: String
+}
+
