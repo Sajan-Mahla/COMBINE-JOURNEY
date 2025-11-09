@@ -33,6 +33,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 6 | Chain Building | ✅ Completed |
 | 7 | Project: Number Streamer | ✅ Completed  |
 | 8 | URLSession.dataTaskPublisher | ✅ Completed  |
+| 9 | Threading: .subscribe(on:) & .receive(on:) | ✅ Completed  |
 
 ---
 
@@ -42,36 +43,28 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 import Combine
 import Foundation
 
-var cancellables = Set<AnyCancellable>()
 
-let url = URL(string: "https://jsonplaceholder.typicode.com/posts")!
+let queue = DispatchQueue.global(qos: .background)
 
-URLSession.shared.dataTaskPublisher(for: url)
-    .map(\.data)
-    .decode(type: [Post].self, decoder: JSONDecoder())
-    .sink(receiveCompletion: { completion in
-        switch completion {
-        case .finished:
-            print("✅ Finished fetching")
-        case .failure(let error):
-            print("❌ Error:", error)
-        }
-    }, receiveValue: { posts in
-        print("📰 Got \(posts.count) posts")
+let publisher = Just("Combine Day 9 🚀 ")
+    .delay(for: .seconds(1), scheduler: queue)
+    .handleEvents(receiveOutput: { _ in
+        print("Emitting on:", Thread.current)
     })
-    .store(in: &cancellables)
+    .subscribe(on: queue)
+    .receive(on: DispatchQueue.main)
+    .sink{
+        value in
+        print("Received on:", Thread.current)
+        print("Value:", value)
+    }
 
-struct Post: Codable {
-    let id: Int
-    let title: String
-    let body: String
-}
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 08
+## 💡 Takeaway of Day 09
 
  It's not just code; it's **data reacting in motion**.
 
