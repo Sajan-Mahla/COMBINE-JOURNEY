@@ -1,0 +1,22 @@
+So its day 09 of combine,
+code:
+
+
+import Combine
+import Foundation
+
+
+let queue = DispatchQueue.global(qos: .background)
+
+let publisher = Just("Combine Day 9 🚀 ")
+    .delay(for: .seconds(1), scheduler: queue)
+    .handleEvents(receiveOutput: { _ in
+        print("Emitting on:", Thread.current)
+    })
+    .subscribe(on: queue)
+    .receive(on: DispatchQueue.main)
+    .sink{
+        value in
+        print("Received on:", Thread.current)
+        print("Value:", value)
+    }
