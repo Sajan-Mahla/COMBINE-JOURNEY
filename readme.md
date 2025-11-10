@@ -34,6 +34,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 7 | Project: Number Streamer | ✅ Completed  |
 | 8 | URLSession.dataTaskPublisher | ✅ Completed  |
 | 9 | Threading: .subscribe(on:) & .receive(on:) | ✅ Completed  |
+| 10 | Error handling: catch, replaceError, tryMap | ✅ Completed  |
 
 ---
 
@@ -43,20 +44,30 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 import Combine
 import Foundation
 
+enum NetworkError: Error{
+    case InvalidResponse
+}
 
-let queue = DispatchQueue.global(qos: .background)
+let urls = ["https://apple.com", "invalid_url", "https://developer.apple.com"]
 
-let publisher = Just("Combine Day 9 🚀 ")
-    .delay(for: .seconds(1), scheduler: queue)
-    .handleEvents(receiveOutput: { _ in
-        print("Emitting on:", Thread.current)
-    })
-    .subscribe(on: queue)
-    .receive(on: DispatchQueue.main)
+let cancellable = urls.publisher
+    .tryMap {
+        urlString -> URL in
+        guard let url = URL(string: urlString) else {
+            throw NetworkError.InvalidResponse
+        }
+        return url
+    }
+    .map{
+        $0.absoluteString.uppercased()
+    }
+    .catch{
+        error in
+        Just("Error occured: \(error)")
+    }
     .sink{
         value in
-        print("Received on:", Thread.current)
-        print("Value:", value)
+        print(value)
     }
 
 
