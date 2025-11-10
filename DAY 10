@@ -1,0 +1,33 @@
+broooooo, this combine journey is getting better day by day......
+like i made a url scanner which will fetch the right url using the Error handelinng and try maps only LIKE WTF....
+code:
+
+
+import Combine
+import Foundation
+
+enum NetworkError: Error{
+    case InvalidResponse
+}
+
+let urls = ["https://apple.com", "invalid_url", "https://developer.apple.com"]
+
+let cancellable = urls.publisher
+    .tryMap {
+        urlString -> URL in
+        guard let url = URL(string: urlString) else {
+            throw NetworkError.InvalidResponse
+        }
+        return url
+    }
+    .map{
+        $0.absoluteString.uppercased()
+    }
+    .catch{
+        error in
+        Just("Error occured: \(error)")
+    }
+    .sink{
+        value in
+        print(value)
+    }
