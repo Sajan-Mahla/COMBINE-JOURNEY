@@ -1,0 +1,39 @@
+so hey everyone as this journey came to an HALFWAY. let's celebrate this little win....
+just kidding, no celebration till appleee.
+
+CODE:
+import Combine
+import Foundation
+
+var cancellables = Set<AnyCancellable>()
+
+// Fake publishers (API calls)
+let userPublisher = Just("👤 User: Sajan")
+    .delay(for: .seconds(1), scheduler: RunLoop.main)
+    .eraseToAnyPublisher()
+
+let postPublisher = Just("📰 Latest Post: Combine Day 11")
+    .delay(for: .seconds(2), scheduler: RunLoop.main)
+    .eraseToAnyPublisher()
+
+// CombineLatest
+Publishers.CombineLatest(userPublisher, postPublisher)
+    .sink { user, post in
+        print("CombineLatest → \(user) | \(post)")
+    }
+    .store(in: &cancellables)
+
+// Zip
+Publishers.Zip(userPublisher, postPublisher)
+    .sink { user, post in
+        print("Zip → \(user) | \(post)")
+    }
+    .store(in: &cancellables)
+
+// Merge (same output type)
+let publisher1 = ["🌧️ Rainy"].publisher
+let publisher2 = ["☀️ Sunny"].publisher
+
+Publishers.Merge(publisher1, publisher2)
+    .sink { print("Merge → \($0)") }
+    .store(in: &cancellables)
