@@ -35,6 +35,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 8 | URLSession.dataTaskPublisher | ✅ Completed  |
 | 9 | Threading: .subscribe(on:) & .receive(on:) | ✅ Completed  |
 | 10 | Error handling: catch, replaceError, tryMap | ✅ Completed  |
+| 11 | CombineLatest / Merge / Zip | ✅ Completed  |
 
 ---
 
@@ -44,38 +45,46 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 import Combine
 import Foundation
 
-enum NetworkError: Error{
-    case InvalidResponse
-}
+var cancellables = Set<AnyCancellable>()
 
-let urls = ["https://apple.com", "invalid_url", "https://developer.apple.com"]
+// Fake publishers (API calls)
+let userPublisher = Just("👤 User: Sajan")
+    .delay(for: .seconds(1), scheduler: RunLoop.main)
+    .eraseToAnyPublisher()
 
-let cancellable = urls.publisher
-    .tryMap {
-        urlString -> URL in
-        guard let url = URL(string: urlString) else {
-            throw NetworkError.InvalidResponse
-        }
-        return url
+let postPublisher = Just("📰 Latest Post: Combine Day 11")
+    .delay(for: .seconds(2), scheduler: RunLoop.main)
+    .eraseToAnyPublisher()
+
+// CombineLatest
+Publishers.CombineLatest(userPublisher, postPublisher)
+    .sink { user, post in
+        print("CombineLatest → \(user) | \(post)")
     }
-    .map{
-        $0.absoluteString.uppercased()
+    .store(in: &cancellables)
+
+// Zip
+Publishers.Zip(userPublisher, postPublisher)
+    .sink { user, post in
+        print("Zip → \(user) | \(post)")
     }
-    .catch{
-        error in
-        Just("Error occured: \(error)")
-    }
-    .sink{
-        value in
-        print(value)
-    }
+    .store(in: &cancellables)
+
+// Merge (same output type)
+let publisher1 = ["🌧️ Rainy"].publisher
+let publisher2 = ["☀️ Sunny"].publisher
+
+Publishers.Merge(publisher1, publisher2)
+    .sink { print("Merge → \($0)") }
+    .store(in: &cancellables)
+
 
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 09
+## 💡 Takeaway of Day 11
 
  It's not just code; it's **data reacting in motion**.
 
