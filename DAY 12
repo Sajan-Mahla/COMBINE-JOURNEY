@@ -1,0 +1,26 @@
+so today, we've done 2 more things in combine. won't tell here. check IDEAL TIME TABLE or README for that. heres the context code:
+
+
+import Combine
+
+var bag = Set<AnyCancellable>()
+
+let tap = PassthroughSubject<Void, Never>()
+let count = CurrentValueSubject<Int, Never>(0)
+
+count
+    .sink { print("Count:", $0) }
+    .store(in: &bag)
+
+tap
+    .sink {
+        count.send(count.value + 1)
+    }
+    .store(in: &bag)
+
+// Simulate events
+tap.send()
+tap.send()
+tap.send()
+count.send(10)
+tap.send()
