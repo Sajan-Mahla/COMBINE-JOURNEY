@@ -72,7 +72,7 @@ tap.send()
 
 ---
 
-## 💡 Takeaway of Day 11
+## 💡 Takeaway of Day 12
 
  It's not just code; it's **data reacting in motion**.
 
