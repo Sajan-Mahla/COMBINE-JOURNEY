@@ -44,41 +44,28 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 
 ```swift
 import Combine
-import Foundation
 
-var cancellables = Set<AnyCancellable>()
+var bag = Set<AnyCancellable>()
 
-// Fake publishers (API calls)
-let userPublisher = Just("👤 User: Sajan")
-    .delay(for: .seconds(1), scheduler: RunLoop.main)
-    .eraseToAnyPublisher()
+let tap = PassthroughSubject<Void, Never>()
+let count = CurrentValueSubject<Int, Never>(0)
 
-let postPublisher = Just("📰 Latest Post: Combine Day 11")
-    .delay(for: .seconds(2), scheduler: RunLoop.main)
-    .eraseToAnyPublisher()
+count
+    .sink { print("Count:", $0) }
+    .store(in: &bag)
 
-// CombineLatest
-Publishers.CombineLatest(userPublisher, postPublisher)
-    .sink { user, post in
-        print("CombineLatest → \(user) | \(post)")
+tap
+    .sink {
+        count.send(count.value + 1)
     }
-    .store(in: &cancellables)
+    .store(in: &bag)
 
-// Zip
-Publishers.Zip(userPublisher, postPublisher)
-    .sink { user, post in
-        print("Zip → \(user) | \(post)")
-    }
-    .store(in: &cancellables)
-
-// Merge (same output type)
-let publisher1 = ["🌧️ Rainy"].publisher
-let publisher2 = ["☀️ Sunny"].publisher
-
-Publishers.Merge(publisher1, publisher2)
-    .sink { print("Merge → \($0)") }
-    .store(in: &cancellables)
-
+// Simulate events
+tap.send()
+tap.send()
+tap.send()
+count.send(10)
+tap.send()
 
 
 ```
