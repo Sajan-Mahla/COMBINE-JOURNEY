@@ -1,4 +1,4 @@
-# 🍏 Combine 21-Day Bootcamp
+i# 🍏 Combine 21-Day Bootcamp
 
 **Reactive Thinking + Swift Mastery Series**  
 Built by **Sajan Mahla** — Goal: Understand and master Apple's Combine framework from the ground up.
@@ -36,6 +36,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 9 | Threading: .subscribe(on:) & .receive(on:) | ✅ Completed  |
 | 10 | Error handling: catch, replaceError, tryMap | ✅ Completed  |
 | 11 | CombineLatest / Merge / Zip | ✅ Completed  |
+| 12 | PassthroughSubject vs CurrentValueSubject | ✅ Completed  |
 
 ---
 
