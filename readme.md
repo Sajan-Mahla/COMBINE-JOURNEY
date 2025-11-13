@@ -37,42 +37,43 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 10 | Error handling: catch, replaceError, tryMap | ✅ Completed  |
 | 11 | CombineLatest / Merge / Zip | ✅ Completed  |
 | 12 | PassthroughSubject vs CurrentValueSubject | ✅ Completed  |
+| 13 | Time based Operators | ✅ Completed  |
 
 ---
 
 ## 🧩 Code Showcase
 
 ```swift
+
 import Combine
+import Foundation
 
-var bag = Set<AnyCancellable>()
+let subject = PassthroughSubject<Int, Never>()
+var cancellables = Set<AnyCancellable>()
 
-let tap = PassthroughSubject<Void, Never>()
-let count = CurrentValueSubject<Int, Never>(0)
+subject
+    .debounce(for: .seconds(1), scheduler: RunLoop.main)
+    .throttle(for: .seconds(2), scheduler: RunLoop.main, latest: true)
+    .delay(for: .seconds(1), scheduler: RunLoop.main)
+    .sink { print("Received:", $0) }
+    .store(in: &cancellables)
 
-count
-    .sink { print("Count:", $0) }
-    .store(in: &bag)
+subject.send(1)
+subject.send(2)
+subject.send(3)
 
-tap
-    .sink {
-        count.send(count.value + 1)
-    }
-    .store(in: &bag)
+DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+    subject.send(4)
+}
 
-// Simulate events
-tap.send()
-tap.send()
-tap.send()
-count.send(10)
-tap.send()
+RunLoop.main.run()
 
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 12
+## 💡 Takeaway of Day 13
 
  It's not just code; it's **data reacting in motion**.
 
