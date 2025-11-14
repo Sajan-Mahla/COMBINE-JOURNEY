@@ -38,6 +38,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 11 | CombineLatest / Merge / Zip | ✅ Completed  |
 | 12 | PassthroughSubject vs CurrentValueSubject | ✅ Completed  |
 | 13 | Time based Operators | ✅ Completed  |
+| 14 | COMBINE exclusive app | ✅ Completed  |
 
 ---
 
@@ -73,7 +74,7 @@ RunLoop.main.run()
 
 ---
 
-## 💡 Takeaway of Day 13
+## 💡 Takeaway of Day 14
 
  It's not just code; it's **data reacting in motion**.
 
