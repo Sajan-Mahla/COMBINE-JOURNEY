@@ -1,4 +1,4 @@
-i# 🍏 Combine 21-Day Bootcamp
+# 🍏 Combine 21-Day Bootcamp
 
 **Reactive Thinking + Swift Mastery Series**  
 Built by **Sajan Mahla** — Goal: Understand and master Apple's Combine framework from the ground up.
