@@ -1,0 +1,43 @@
+so today i did;
+@Published + ObservableObject 🚀
+
+CODE:
+import Combine
+
+class userViewModel : ObservableObject{
+    @Published var name: String = ""
+    @Published var age: Int = 0
+    
+    var cancellable = Set<AnyCancellable>()
+    
+    init(){
+        setBindings()
+    }
+    
+    private func setBindings(){
+        $name
+            .sink{
+                newValue in
+                print("Name Updated -> \(newValue)")
+            }
+            .store(in: &cancellable)
+        
+        $age
+            .map {
+                $0 >= 18 ? "Adult" : "Minor"
+            }
+            .sink{
+                status in
+                print("Status -> \(status)")
+            }
+            .store(in: &cancellable)
+    }
+}
+
+let vm = userViewModel()
+
+vm.name = "Sajan Mahla"
+vm.age = 17
+
+vm.age = 20
+vm.name = "Steve"
