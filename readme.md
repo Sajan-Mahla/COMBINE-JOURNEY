@@ -39,6 +39,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 12 | PassthroughSubject vs CurrentValueSubject | ✅ Completed  |
 | 13 | Time based Operators | ✅ Completed  |
 | 14 | COMBINE exclusive app | ✅ Completed  |
+| 15 | @Published + ObservableObject | ✅ Completed  |
 
 ---
 
@@ -47,27 +48,46 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 ```swift
 
 import Combine
-import Foundation
 
-let subject = PassthroughSubject<Int, Never>()
-var cancellables = Set<AnyCancellable>()
-
-subject
-    .debounce(for: .seconds(1), scheduler: RunLoop.main)
-    .throttle(for: .seconds(2), scheduler: RunLoop.main, latest: true)
-    .delay(for: .seconds(1), scheduler: RunLoop.main)
-    .sink { print("Received:", $0) }
-    .store(in: &cancellables)
-
-subject.send(1)
-subject.send(2)
-subject.send(3)
-
-DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-    subject.send(4)
+class userViewModel : ObservableObject{
+    @Published var name: String = ""
+    @Published var age: Int = 0
+    
+    var cancellable = Set<AnyCancellable>()
+    
+    init(){
+        setBindings()
+    }
+    
+    private func setBindings(){
+        $name
+            .sink{
+                newValue in
+                print("Name Updated -> \(newValue)")
+            }
+            .store(in: &cancellable)
+        
+        $age
+            .map {
+                $0 >= 18 ? "Adult" : "Minor"
+            }
+            .sink{
+                status in
+                print("Status -> \(status)")
+            }
+            .store(in: &cancellable)
+    }
 }
 
-RunLoop.main.run()
+let vm = userViewModel()
+
+vm.name = "Sajan Mahla"
+vm.age = 17
+
+vm.age = 20
+vm.name = "Steve"
+
+
 
 
 ```
