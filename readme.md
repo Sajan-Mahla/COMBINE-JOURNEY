@@ -40,6 +40,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 13 | Time based Operators | ✅ Completed  |
 | 14 | COMBINE exclusive app | ✅ Completed  |
 | 15 | @Published + ObservableObject | ✅ Completed  |
+| 16 | assigns(to: on)| ✅ Completed  |
 
 ---
 
