@@ -1,0 +1,25 @@
+today is day 16. 
+code :
+import Combine
+
+class MessageUpdater {
+    var message: String = ""
+    private var cancellables = Set<AnyCancellable>()
+
+    let input = PassthroughSubject<Int, Never>()
+
+    init() {
+        input
+            .map { "Value: \($0)" }
+            .assign(to: \.message, on: self)
+            .store(in: &cancellables)
+    }
+}
+
+let updater = MessageUpdater()
+
+updater.input.send(10)
+print(updater.message)
+
+updater.input.send(42)
+print(updater.message)
