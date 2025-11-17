@@ -1,0 +1,66 @@
+so today i did, .print() + .handleEvents()
+CODE:
+
+import Combine
+import Foundation
+
+var cancellables = Set<AnyCancellable>()
+
+let numbers = [1,2,3,4,5,6].publisher
+
+numbers
+    .handleEvents(
+        receiveSubscription: { _ in
+            print("Subscribed")
+        },
+        receiveOutput: { value in
+            
+            print("Output Recieved: ",value)
+        },
+        receiveCompletion: {
+            completion in
+            print("Completed with:", completion)
+        },
+        receiveCancel: {
+            print("Cancelled")
+        },
+        receiveRequest: {
+            demand in
+            print("Demand: ",demand)
+        }
+    )
+    .map{$0 * 10}
+    .print("Debug")
+    .sink{
+        value in
+        print("Final:", value)
+    }
+    .store(in: &cancellables)
+
+
+OUPUT:
+
+Subscribed
+Debug: receive subscription: (HandleEvents)
+Debug: request unlimited
+Demand:  unlimited
+Output Recieved:  1
+Debug: receive value: (10)
+Final: 10
+Output Recieved:  2
+Debug: receive value: (20)
+Final: 20
+Output Recieved:  3
+Debug: receive value: (30)
+Final: 30
+Output Recieved:  4
+Debug: receive value: (40)
+Final: 40
+Output Recieved:  5
+Debug: receive value: (50)
+Final: 50
+Output Recieved:  6
+Debug: receive value: (60)
+Final: 60
+Completed with: finished
+Debug: receive finished
