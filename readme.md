@@ -41,6 +41,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 14 | COMBINE exclusive app | ✅ Completed  |
 | 15 | @Published + ObservableObject | ✅ Completed  |
 | 16 | assigns(to: on)| ✅ Completed  |
+| 17 | .print() + .handleEvents() | ✅ Completed  |
 
 ---
 
@@ -49,53 +50,47 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 ```swift
 
 import Combine
+import Foundation
 
-class userViewModel : ObservableObject{
-    @Published var name: String = ""
-    @Published var age: Int = 0
-    
-    var cancellable = Set<AnyCancellable>()
-    
-    init(){
-        setBindings()
+var cancellables = Set<AnyCancellable>()
+
+let numbers = [1,2,3,4,5,6].publisher
+
+numbers
+    .handleEvents(
+        receiveSubscription: { _ in
+            print("Subscribed")
+        },
+        receiveOutput: { value in
+            
+            print("Output Recieved: ",value)
+        },
+        receiveCompletion: {
+            completion in
+            print("Completed with:", completion)
+        },
+        receiveCancel: {
+            print("Cancelled")
+        },
+        receiveRequest: {
+            demand in
+            print("Demand: ",demand)
+        }
+    )
+    .map{$0 * 10}
+    .print("Debug")
+    .sink{
+        value in
+        print("Final:", value)
     }
-    
-    private func setBindings(){
-        $name
-            .sink{
-                newValue in
-                print("Name Updated -> \(newValue)")
-            }
-            .store(in: &cancellable)
-        
-        $age
-            .map {
-                $0 >= 18 ? "Adult" : "Minor"
-            }
-            .sink{
-                status in
-                print("Status -> \(status)")
-            }
-            .store(in: &cancellable)
-    }
-}
-
-let vm = userViewModel()
-
-vm.name = "Sajan Mahla"
-vm.age = 17
-
-vm.age = 20
-vm.name = "Steve"
-
-
+    .store(in: &cancellables)
 
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 14
+## 💡 Takeaway of Day 17
 
  It's not just code; it's **data reacting in motion**.
 
