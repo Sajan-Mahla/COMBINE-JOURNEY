@@ -42,6 +42,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 15 | @Published + ObservableObject | ✅ Completed  |
 | 16 | assigns(to: on)| ✅ Completed  |
 | 17 | .print() + .handleEvents() | ✅ Completed  |
+| 18 | Combine + ASYNC/AWAIT | ✅ Completed  |
 
 ---
 
@@ -49,48 +50,49 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 
 ```swift
 
-import Combine
 import Foundation
+import Combine
+import _Concurrency
 
-var cancellables = Set<AnyCancellable>()
 
-let numbers = [1,2,3,4,5,6].publisher
+PlaygroundPage.current.needsIndefiniteExecution = true
 
-numbers
-    .handleEvents(
-        receiveSubscription: { _ in
-            print("Subscribed")
-        },
-        receiveOutput: { value in
-            
-            print("Output Recieved: ",value)
-        },
-        receiveCompletion: {
-            completion in
-            print("Completed with:", completion)
-        },
-        receiveCancel: {
-            print("Cancelled")
-        },
-        receiveRequest: {
-            demand in
-            print("Demand: ",demand)
+
+let timerPublisher = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+/// Example function that consumes a Combine Publisher with async/await
+func startAsyncTimer() -> Task<Void, Never> {
+    return Task {
+        print("⏱ Timer started (Combine → async)")
+
+        // Consume the publisher as an AsyncSequence
+        var count = 0
+        for await tick in timerPublisher.values {
+            count += 1
+            print("Tick: \(count) — \(tick)")
+
+            if count == 5 {
+                print("⛔️ Reached 5 ticks, stopping task…")
+                selfTask?.cancel()
+            }
         }
-    )
-    .map{$0 * 10}
-    .print("Debug")
-    .sink{
-        value in
-        print("Final:", value)
+
+        print("Task finished.")
     }
-    .store(in: &cancellables)
+}
+
+
+var selfTask: Task<Void, Never>?
+
+
+selfTask = startAsyncTimer()
 
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 17
+## 💡 Takeaway of Day 18
 
  It's not just code; it's **data reacting in motion**.
 
