@@ -1,0 +1,39 @@
+so taoday, i did ASYNC + COMBINE.
+code:
+
+import Foundation
+import Combine
+import _Concurrency
+
+
+PlaygroundPage.current.needsIndefiniteExecution = true
+
+
+let timerPublisher = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+/// Example function that consumes a Combine Publisher with async/await
+func startAsyncTimer() -> Task<Void, Never> {
+    return Task {
+        print("⏱ Timer started (Combine → async)")
+
+        // Consume the publisher as an AsyncSequence
+        var count = 0
+        for await tick in timerPublisher.values {
+            count += 1
+            print("Tick: \(count) — \(tick)")
+
+            if count == 5 {
+                print("⛔️ Reached 5 ticks, stopping task…")
+                selfTask?.cancel()
+            }
+        }
+
+        print("Task finished.")
+    }
+}
+
+
+var selfTask: Task<Void, Never>?
+
+
+selfTask = startAsyncTimer()
