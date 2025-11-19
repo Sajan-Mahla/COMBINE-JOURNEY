@@ -43,56 +43,42 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 16 | assigns(to: on)| ✅ Completed  |
 | 17 | .print() + .handleEvents() | ✅ Completed  |
 | 18 | Combine + ASYNC/AWAIT | ✅ Completed  |
+| 19 | Reusable Combine network layer (NetworkManager) | ✅ Completed  |
 
 ---
 
 ## 🧩 Code Showcase
 
 ```swift
-
-import Foundation
 import Combine
-import _Concurrency
+import Foundation
 
+let numbers = (1...10).publisher
 
-PlaygroundPage.current.needsIndefiniteExecution = true
+var cancellable = Set<AnyCancellable>()
 
+print("Starting Combine Pipeline.... \n")
 
-let timerPublisher = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-
-/// Example function that consumes a Combine Publisher with async/await
-func startAsyncTimer() -> Task<Void, Never> {
-    return Task {
-        print("⏱ Timer started (Combine → async)")
-
-        // Consume the publisher as an AsyncSequence
-        var count = 0
-        for await tick in timerPublisher.values {
-            count += 1
-            print("Tick: \(count) — \(tick)")
-
-            if count == 5 {
-                print("⛔️ Reached 5 ticks, stopping task…")
-                selfTask?.cancel()
-            }
-        }
-
-        print("Task finished.")
+numbers
+    .map{$0 * 2}
+    .filter{$0 % 4 == 0}
+    .handleEvents(
+        receiveSubscription: {_ in print("Subscribed!")},
+        receiveOutput: {value in print("Emitting Value: \(value)")},
+        receiveCompletion: {_ in print("PipeLine Completed.")}
+    )
+    .sink{
+        value in
+        print("Final Received: \(value)")
     }
-}
-
-
-var selfTask: Task<Void, Never>?
-
-
-selfTask = startAsyncTimer()
+    .store(in: &cancellable)
 
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 18
+## 💡 Takeaway of Day 19
 
  It's not just code; it's **data reacting in motion**.
 
