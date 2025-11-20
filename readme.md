@@ -44,6 +44,7 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 17 | .print() + .handleEvents() | ✅ Completed  |
 | 18 | Combine + ASYNC/AWAIT | ✅ Completed  |
 | 19 | Reusable Combine network layer (NetworkManager) | ✅ Completed  |
+| 20 | Review + optimization | ✅ Completed  |
 
 ---
 
@@ -78,7 +79,7 @@ numbers
 
 ---
 
-## 💡 Takeaway of Day 19
+## 💡 Takeaway of Day 20
 
  It's not just code; it's **data reacting in motion**.
 
