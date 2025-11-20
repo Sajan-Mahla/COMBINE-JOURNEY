@@ -1,0 +1,257 @@
+so today was the last day of learning, like tommorow then PROJECT then all done.
+
+import Foundation
+import Combine
+
+// Needed to keep Playground running
+import PlaygroundSupport
+PlaygroundPage.current.needsIndefiniteExecution = true
+
+var cancellables = Set<AnyCancellable>()
+
+// MARK: - DAY 1: Basic Publisher → Subscriber
+print("\n--- DAY 1 ---")
+let day1Publisher = [1, 2, 3].publisher
+day1Publisher
+    .sink { value in print("Day1:", value) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 2: Just, Future
+print("\n--- DAY 2 ---")
+Just("Hello from Just")
+    .sink { print($0) }
+    .store(in: &cancellables)
+
+Future<Int, Never> { promise in
+    DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+        promise(.success(200))
+    }
+}
+.sink { print("Future value:", $0) }
+.store(in: &cancellables)
+
+
+// MARK: - DAY 3: AnyCancellable & Memory
+print("\n--- DAY 3 ---")
+let memoryPub = Timer.publish(every: 0.5, on: .main, in: .default)
+let memorySub = memoryPub.autoconnect().sink { print("Timer:", $0) }
+DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+    memorySub.cancel()
+    print("Timer cancelled ✔️")
+}
+
+
+// MARK: - DAY 4: map, filter, compactMap
+print("\n--- DAY 4 ---")
+["1", "x", "3", "7"]
+    .compactMap { Int($0) }
+    .map { $0 * 10 }
+    .filter { $0 > 20 }
+    .sink { print("Transformed:", $0) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 5: Errors
+print("\n--- DAY 5 ---")
+enum NumberError: Error { case invalid }
+
+[1, 2, 0, 4].publisher
+    .tryMap { n -> Int in
+        if n == 0 { throw NumberError.invalid }
+        return 100 / n
+    }
+    .catch { _ in Just(-999) }
+    .sink { print("Result:", $0) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 6: Full Chain
+print("\n--- DAY 6 ---")
+(1...10).publisher
+    .map { $0 * 3 }
+    .filter { $0 % 2 == 0 }
+    .sink { print("Chain:", $0) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 7: Timer + Subject (Countdown)
+print("\n--- DAY 7 ---")
+let inputSubject = PassthroughSubject<Int, Never>()
+inputSubject
+    .flatMap { number in
+        Timer.publish(every: 1, on: .main, in: .default)
+            .autoconnect()
+            .scan(number) { count, _ in count - 1 }
+            .prefix(while: { $0 >= 0 })
+    }
+    .sink { print("Countdown:", $0) }
+    .store(in: &cancellables)
+
+inputSubject.send(5)
+
+
+// MARK: - DAY 8: dataTaskPublisher Networking
+print("\n--- DAY 8 ---")
+struct Post: Decodable { let id: Int; let title: String }
+
+URL(string: "https://jsonplaceholder.typicode.com/posts/1")!
+    .publisherFromURL()
+    .sink(receiveCompletion: { print("Completion:", $0) },
+          receiveValue: { (post: Post) in print("Post:", post.title) })
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 9: Threading
+print("\n--- DAY 9 ---")
+Just("Background work")
+    .subscribe(on: DispatchQueue.global())
+    .map { text -> String in
+        print("Running on:", Thread.isMainThread)
+        return text.uppercased()
+    }
+    .receive(on: DispatchQueue.main)
+    .sink { print("Back on main:", Thread.isMainThread) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 10: replaceError + tryMap
+print("\n--- DAY 10 ---")
+Just("100")
+    .tryMap { str -> Int in
+        guard let n = Int(str) else { throw NumberError.invalid }
+        return n
+    }
+    .replaceError(with: -1)
+    .sink { print("Parsed:", $0) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 11: Merge + Zip
+print("\n--- DAY 11 ---")
+let first = [1, 2, 3].publisher
+let second = ["A", "B", "C"].publisher
+
+Publishers.Zip(first, second)
+    .sink { print("Zipped →", $0) }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 12: Subjects
+print("\n--- DAY 12 ---")
+let ps = PassthroughSubject<String, Never>()
+let cvs = CurrentValueSubject<Int, Never>(10)
+
+ps.sink { print("Passthrough:", $0) }.store(in: &cancellables)
+cvs.sink { print("CurrentValue:", $0) }.store(in: &cancellables)
+
+ps.send("Hello Sajan 🔥")
+cvs.send(99)
+
+
+// MARK: - DAY 13: Debounce / Throttle
+print("\n--- DAY 13 ---")
+let search = PassthroughSubject<String, Never>()
+
+search
+    .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+    .sink { print("Search request →", $0) }
+    .store(in: &cancellables)
+
+search.send("S")
+search.send("Sa")
+search.send("Saj")
+search.send("Saja")
+DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+    search.send("Sajan")
+}
+
+
+// MARK: - DAY 14: Weather Logic (Simplified)
+print("\n--- DAY 14 ---")
+struct Weather: Decodable { let temp: Double }
+
+URL(string: "https://api.weatherapi.com/v1/current.json?key=demo&q=London")!
+    .publisherFromURL()
+    .sink(receiveCompletion: { print($0) },
+          receiveValue: { (w: Weather) in print("Temperature:", w.temp) })
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 15: @Published Simulation
+print("\n--- DAY 15 ---")
+class VM: ObservableObject {
+    @Published var value = 0
+}
+let vm = VM()
+vm.$value
+    .sink { print("Published update:", $0) }
+    .store(in: &cancellables)
+
+vm.value = 5
+vm.value = 9
+
+
+// MARK: - DAY 16: assign(to:)
+print("\n--- DAY 16 ---")
+class LabelHolder {
+    var text = "" { didSet { print("Label:", text) } }
+}
+let lh = LabelHolder()
+
+Just("Assigned with Combine")
+    .assign(to: \.text, on: lh)
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 17: Debugging
+print("\n--- DAY 17 ---")
+[10, 20, 30].publisher
+    .print("Pipeline")
+    .handleEvents(receiveOutput: { print("Event output:", $0) })
+    .sink { _ in }
+    .store(in: &cancellables)
+
+
+// MARK: - DAY 18: async/await bridge
+print("\n--- DAY 18 ---")
+func asyncFromPublisher<T>(_ pub: AnyPublisher<T, Never>) async -> T {
+    await withCheckedContinuation { continuation in
+        pub.sink { value in continuation.resume(returning: value) }
+            .store(in: &cancellables)
+    }
+}
+
+Task {
+    let value = await asyncFromPublisher(Just(42).eraseToAnyPublisher())
+    print("Async received:", value)
+}
+
+
+// MARK: - DAY 19: Reusable Network Layer
+print("\n--- DAY 19 ---")
+
+struct NetworkManager {
+    static func fetch<T: Decodable>(_ url: URL) -> AnyPublisher<T, Error> {
+        URLSession.shared.dataTaskPublisher(for: url)
+            .map(\.data)
+            .decode(type: T.self, decoder: JSONDecoder())
+            .eraseToAnyPublisher()
+    }
+}
+
+NetworkManager.fetch(URL(string: "https://jsonplaceholder.typicode.com/todos/1")!)
+    .sink(receiveCompletion: { print($0) },
+          receiveValue: { value in print("Todo:", value) })
+    .store(in: &cancellables)
+
+
+// MARK: - Helper Extension
+extension URL {
+    func publisherFromURL<T: Decodable>() -> AnyPublisher<T, Error> {
+        URLSession.shared.dataTaskPublisher(for: self)
+            .map(\.data)
+            .decode(type: T.self, decoder: JSONDecoder())
+            .eraseToAnyPublisher()
+    }
+}
