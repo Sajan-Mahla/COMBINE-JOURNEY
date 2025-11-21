@@ -45,41 +45,34 @@ To build a rock-solid understanding of data flow in Combine and apply it to real
 | 18 | Combine + ASYNC/AWAIT | ✅ Completed  |
 | 19 | Reusable Combine network layer (NetworkManager) | ✅ Completed  |
 | 20 | Review + optimization | ✅ Completed  |
+| 21 | “GitHub Profile Fetcher” — Reactive search, live API, Combine ViewModel | ✅ Completed  |
 
 ---
 
 ## 🧩 Code Showcase
 
 ```swift
-import Combine
-import Foundation
-
-let numbers = (1...10).publisher
-
-var cancellable = Set<AnyCancellable>()
-
-print("Starting Combine Pipeline.... \n")
-
-numbers
-    .map{$0 * 2}
-    .filter{$0 % 4 == 0}
-    .handleEvents(
-        receiveSubscription: {_ in print("Subscribed!")},
-        receiveOutput: {value in print("Emitting Value: \(value)")},
-        receiveCompletion: {_ in print("PipeLine Completed.")}
-    )
-    .sink{
-        value in
-        print("Final Received: \(value)")
+$username
+    .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+    .removeDuplicates()
+    .filter { !$0.isEmpty }
+    .flatMap { username -> AnyPublisher<GitHubUser, Error> in
+        let url = URL(string: "https://api.github.com/users/\(username)")!
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .map(\.data)
+            .decode(type: GitHubUser.self, decoder: JSONDecoder())
+            .eraseToAnyPublisher()
     }
-    .store(in: &cancellable)
+    .receive(on: RunLoop.main)
+    .sink { ... } receiveValue: { ... }
+
 
 
 ```
 
 ---
 
-## 💡 Takeaway of Day 20
+## 💡 Takeaway of Day 21
 
  It's not just code; it's **data reacting in motion**.
 
